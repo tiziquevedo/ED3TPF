@@ -1,4 +1,4 @@
-#include "display.h"
+#include "display/display.h"
 
 
 #include "lpc17xx_gpdma.h"
@@ -66,8 +66,8 @@ static WS2812_DMA_LLI_T wsDMAlli;
 /* Private Function Prototypes                                                */
 /* -------------------------------------------------------------------------- */
 
-static void WS2812_InitSSP0(void);
-static void WS2812_InitDMA(void);
+static void display_initSSP0(void);
+static void display_initDMA(void);
 
 static void WS2812_EncodeColor(
     uint16_t ledIndex,
@@ -207,7 +207,7 @@ static void WS2812_EncodeColor(
 /* SSP0 Configuration                                                         */
 /* -------------------------------------------------------------------------- */
 
-static void WS2812_InitSSP0(void)
+static void display_initSSP0(void)
 {
     PINSEL_CFG_T pinCfg;
 
@@ -250,7 +250,7 @@ static void WS2812_InitSSP0(void)
 /* DMA Configuration                                                          */
 /* -------------------------------------------------------------------------- */
 
-static void WS2812_InitDMA(void)
+static void display_initDMA(void)
 {
     GPDMA_Channel_CFG_T dmaCfg;
 
@@ -331,7 +331,7 @@ static void WS2812_InitDMA(void)
 /* Public API                                                                 */
 /* -------------------------------------------------------------------------- */
 
-void WS2812_Init(void)
+void display_init(void)
 {
     /*
      * Clear entire framebuffer.
@@ -344,20 +344,20 @@ void WS2812_Init(void)
         sizeof(wsFramebuffer)
     );
 
-    WS2812_InitSSP0();
-    WS2812_InitDMA();
+    display_initSSP0();
+    display_initDMA();
 
-    WS2812_Clear();
+    display_clear();
 }
 
-void WS2812_Start(void)
+void display_start(void)
 {
     GPDMA_ChannelStart(
         WS2812_DMA_CHANNEL
     );
 }
 
-void WS2812_Stop(void)
+void display_stop(void)
 {
     GPDMA_ChannelGracefulStop(
         WS2812_DMA_CHANNEL
@@ -368,7 +368,7 @@ void WS2812_Stop(void)
 /* LED Manipulation                                                           */
 /* -------------------------------------------------------------------------- */
 
-void WS2812_SetLED(
+void display_setLED(
     uint8_t x,
     uint8_t y,
     uint8_t r,
@@ -432,7 +432,7 @@ void WS2812_Fill(
     }
 }
 
-void WS2812_Clear(void)
+void display_clear(void)
 {
     /*
      * Only clear LED data.

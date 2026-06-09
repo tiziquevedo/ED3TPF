@@ -331,7 +331,7 @@ static void WS2812_InitDMA(void)
 /* Public API                                                                 */
 /* -------------------------------------------------------------------------- */
 
-void WS2812_Init(void)
+void display_init(void)
 {
     /*
      * Clear entire framebuffer.
@@ -347,10 +347,10 @@ void WS2812_Init(void)
     WS2812_InitSSP0();
     WS2812_InitDMA();
 
-    WS2812_Clear();
+    display_clear();
 }
 
-void WS2812_Start(void)
+void display_start(void)
 {
     GPDMA_ChannelStart(
         WS2812_DMA_CHANNEL
@@ -368,7 +368,7 @@ void WS2812_Stop(void)
 /* LED Manipulation                                                           */
 /* -------------------------------------------------------------------------- */
 
-void WS2812_SetLED(
+void display_SetLED(
     uint8_t x,
     uint8_t y,
     uint8_t r,
@@ -432,7 +432,7 @@ void WS2812_Fill(
     }
 }
 
-void WS2812_Clear(void)
+void display_clear(void)
 {
     /*
      * Only clear LED data.

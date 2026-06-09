@@ -69,12 +69,12 @@ typedef struct {
  *
  * Does not start transmission automatically.
  */
-void WS2812_Init(void);
+void display_init(void);
 
 /**
  * @brief Start continuous DMA streaming.
  */
-void WS2812_Start(void);
+void display_start(void);
 
 /**
  * @brief Stop DMA streaming.
@@ -84,7 +84,7 @@ void WS2812_Stop(void);
 /**
  * @brief Turn off all LEDs.
  */
-void WS2812_Clear(void);
+void display_clear(void);
 
 /**
  * @brief Fill all LEDs with same color.
@@ -116,7 +116,7 @@ void WS2812_Fill(uint8_t r, uint8_t g, uint8_t b);
  * @param g Green (0-255)
  * @param b Blue  (0-255)
  */
-void WS2812_SetLED(
+void display_SetLED(
     uint8_t x,
     uint8_t y,
     uint8_t r,

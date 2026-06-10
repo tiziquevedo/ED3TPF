@@ -34,7 +34,6 @@ int main(void)
 
     display_init();
     display_start();
-    display_test();
 
     DAC_PLAYER_Init(8000);
 
@@ -48,7 +47,7 @@ int main(void)
     setup_timer(&game_time_ms);
     game_start(game_time_ms);
     DAC_PLAYER_Play(song_audio, song_audio_length);
-    display_test();
+
 
 
 
@@ -60,6 +59,7 @@ int main(void)
         {
             __asm volatile ("nop");
         }
+        game_update(game_time_ms);
 
     }
 }

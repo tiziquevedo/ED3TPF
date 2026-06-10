@@ -11,7 +11,7 @@
 /* Configuration                                                              */
 /* -------------------------------------------------------------------------- */
 
-#define WS2812_SPI_CLOCK_HZ         2400000UL
+#define WS2812_SPI_CLOCK_HZ         2300000UL
 #define WS2812_DMA_CHANNEL          GPDMA_CH_3
 
 /*
@@ -36,7 +36,7 @@
  * Reset tail = 32 bytes
  * Total = 608 bytes
  */
-static uint8_t wsFramebuffer[WS2812_FRAMEBUFFER_SIZE];
+
 
 /*
  * Runtime brightness
@@ -420,35 +420,6 @@ void WS2812_SetIndex(
         g,
         b
     );
-}
-
-void display_test(){
-    while (1)
-    {
-        for (uint8_t y = 0;
-             y < WS2812_MATRIX_HEIGHT;
-             y++)
-        {
-            for (uint8_t x = 0;
-                 x < WS2812_MATRIX_WIDTH;
-                 x++)
-            {
-                volatile uint32_t count = 1000000;
-                while (count--)
-                display_clear();
-
-                display_setLED(
-                    x,
-                    y,
-                    255, 0, 0
-                );
-
-                for (volatile uint32_t i = 0;
-                     i < 1000000;
-                     i++);
-            }
-        }
-    }
 }
 
 void WS2812_Fill(

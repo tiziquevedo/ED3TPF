@@ -88,20 +88,20 @@ uint8_t b = 0;
 switch (note->lane)
 {
     case 0: // green
-        g = 5;
+        g = 16;
         break;
 
     case 1: // red
-        r = 5;
+        r = 16;
         break;
 
     case 2: // yellow
-        r = 5;
+        r = 16;
         g = 5;
         break;
 
     case 3: // blue
-        b = 5;
+        b = 16;
         break;
 }
 
@@ -109,6 +109,15 @@ int32_t x0 = x;
 int32_t x1 = x;
 
 
+if (y0 & 1)
+{
+    x0 = 7 - x0;
+}
+
+if (y1 & 1)
+{
+    x1 = 7 - x1;
+}
 display_setLED(
     x0,
     y0,

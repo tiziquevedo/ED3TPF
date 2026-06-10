@@ -18,7 +18,7 @@ void setup_timer(volatile uint32_t *timeMs){
 
 	static TIM_TIMERCFG_T tmrconf= {0};
 	tmrconf.prescaleOpt= TIM_US;
-	tmrconf.prescaleValue = 1000;
+	tmrconf.prescaleValue = 500;
 
 	TIM_InitTimer(LPC_TIM0, &tmrconf);
 
@@ -28,11 +28,11 @@ void setup_timer(volatile uint32_t *timeMs){
 	mr0Conf.stopEn= DISABLE;
 	mr0Conf.resetEn= ENABLE;
 	mr0Conf.extOpt= 0;
-	mr0Conf.matchValue= 0;
+	mr0Conf.matchValue= 1;
 
 	TIM_ConfigMatch(LPC_TIM0, &mr0Conf);
 
-	//NVIC_EnableIRQ(TIMER0_IRQn);
+	NVIC_EnableIRQ(TIMER0_IRQn);
 	TIM_Enable(LPC_TIM0);
 
 }

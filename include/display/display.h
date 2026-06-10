@@ -1,9 +1,6 @@
 #ifndef WS2812_MATRIX_H_
 #define WS2812_MATRIX_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -24,7 +21,7 @@ extern "C" {
 #define WS2812_FRAMEBUFFER_SIZE \
     ((WS2812_LED_COUNT * WS2812_BYTES_PER_LED) + WS2812_RESET_BYTES)
 
-
+static uint8_t wsFramebuffer[WS2812_FRAMEBUFFER_SIZE];
 #define WS2812_BRIGHTNESS_PERCENT   100U
 
 typedef struct {
@@ -76,8 +73,6 @@ void WS2812_SetBrightness(uint8_t brightness);
 
 uint8_t WS2812_GetBrightness(void);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* WS2812_MATRIX_H_ */

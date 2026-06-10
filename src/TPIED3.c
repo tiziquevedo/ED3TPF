@@ -21,6 +21,7 @@
 #include "display/display.h"
 #include "game/game.h"
 #include "song/song.h"
+#include "audio/audio.h"
 #include "song/song_audio.h"
 #include "mstimer/mstimer.h"
 
@@ -33,6 +34,9 @@ int main(void)
 
     display_init();
     display_start();
+    display_test();
+
+    DAC_PLAYER_Init(8000);
 
     game_init();
 
@@ -43,12 +47,19 @@ int main(void)
     );
     setup_timer(&game_time_ms);
     game_start(game_time_ms);
+    DAC_PLAYER_Play(song_audio, song_audio_length);
+    display_test();
 
 
 
 
     while(1)
     {
-    	game_update(game_time_ms);
+        volatile uint32_t count = 1000000;
+        while (count--)
+        {
+            __asm volatile ("nop");
+        }
+
     }
 }

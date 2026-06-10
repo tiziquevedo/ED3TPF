@@ -203,6 +203,28 @@ static void WS2812_EncodeColor(
     WS2812_EncodeByte(r, &ledPtr[3]);
     WS2812_EncodeByte(b, &ledPtr[6]);
 }
+
+static void WS2812_FillEncodedZero(void)
+{
+
+    uint8_t encoded[3];
+
+    WS2812_EncodeByte(0x00, encoded);
+
+    for (uint32_t i = 0; i < WS2812_LED_COUNT; i++)
+    {
+        uint8_t *ledPtr = &wsFramebuffer[i * WS2812_BYTES_PER_LED];
+
+        // Fill GRB with encoded zero
+        memcpy(&ledPtr[0], encoded, 3);
+        memcpy(&ledPtr[3], encoded, 3);
+        memcpy(&ledPtr[6], encoded, 3);
+    }
+
+    memset(&wsFramebuffer[WS2812_LED_COUNT * WS2812_BYTES_PER_LED],
+           0,
+           WS2812_FRAMEBUFFER_SIZE - (WS2812_LED_COUNT * WS2812_BYTES_PER_LED));
+}
 /* -------------------------------------------------------------------------- */
 /* SSP0 Configuration                                                         */
 /* -------------------------------------------------------------------------- */
@@ -246,9 +268,6 @@ static void display_initSSP0(void)
     SSP_Cmd(LPC_SSP0, ENABLE);
 }
 
-/* -------------------------------------------------------------------------- */
-/* DMA Configuration                                                          */
-/* -------------------------------------------------------------------------- */
 
 static void display_initDMA(void)
 {
@@ -327,22 +346,16 @@ static void display_initDMA(void)
     GPDMA_SetupChannel(&dmaCfg);
 }
 
-/* -------------------------------------------------------------------------- */
-/* Public API                                                                 */
-/* -------------------------------------------------------------------------- */
 
 void display_init(void)
 {
-    /*
-     * Clear entire framebuffer.
-     *
-     * Reset tail must remain zero.
-     */
+
     memset(
         wsFramebuffer,
         0,
         sizeof(wsFramebuffer)
     );
+    WS2812_FillEncodedZero();
 
     display_initSSP0();
     display_initDMA();
@@ -363,10 +376,6 @@ void display_stop(void)
         WS2812_DMA_CHANNEL
     );
 }
-
-/* -------------------------------------------------------------------------- */
-/* LED Manipulation                                                           */
-/* -------------------------------------------------------------------------- */
 
 void display_setLED(
     uint8_t x,
@@ -413,6 +422,35 @@ void WS2812_SetIndex(
     );
 }
 
+void display_test(){
+    while (1)
+    {
+        for (uint8_t y = 0;
+             y < WS2812_MATRIX_HEIGHT;
+             y++)
+        {
+            for (uint8_t x = 0;
+                 x < WS2812_MATRIX_WIDTH;
+                 x++)
+            {
+                volatile uint32_t count = 1000000;
+                while (count--)
+                display_clear();
+
+                display_setLED(
+                    x,
+                    y,
+                    255, 0, 0
+                );
+
+                for (volatile uint32_t i = 0;
+                     i < 1000000;
+                     i++);
+            }
+        }
+    }
+}
+
 void WS2812_Fill(
     uint8_t r,
     uint8_t g,
@@ -434,23 +472,9 @@ void WS2812_Fill(
 
 void display_clear(void)
 {
-    /*
-     * Only clear LED data.
-     *
-     * Leave reset tail untouched
-     * (already zero).
-     */
-    memset(
-        wsFramebuffer,
-        0,
-        WS2812_LED_COUNT *
-        WS2812_BYTES_PER_LED
-    );
+    WS2812_FillEncodedZero();
 }
 
-/* -------------------------------------------------------------------------- */
-/* Framebuffer Access                                                         */
-/* -------------------------------------------------------------------------- */
 
 uint8_t* WS2812_GetFramebuffer(void)
 {
@@ -462,9 +486,6 @@ uint32_t WS2812_GetFramebufferSize(void)
     return WS2812_FRAMEBUFFER_SIZE;
 }
 
-/* -------------------------------------------------------------------------- */
-/* Brightness                                                                 */
-/* -------------------------------------------------------------------------- */
 
 void WS2812_SetBrightness(
     uint8_t brightness

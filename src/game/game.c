@@ -108,19 +108,6 @@ switch (note->lane)
 int32_t x0 = x;
 int32_t x1 = x;
 
-/*
- * Serpentine compensation:
- * odd rows are mirrored
- */
-if (y0 & 1)
-{
-    x0 = 7 - x0;
-}
-
-if (y1 & 1)
-{
-    x1 = 7 - x1;
-}
 
 display_setLED(
     x0,

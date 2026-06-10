@@ -10,6 +10,6 @@
 
 #include <stdint.h>
 
-void setup_timer(uint32_t *timeMs);
+void setup_timer(volatile uint32_t *timeMs);
 
 #endif /* MSTIMER_MSTIMER_H_ */

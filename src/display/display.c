@@ -11,7 +11,7 @@
 /* Configuration                                                              */
 /* -------------------------------------------------------------------------- */
 
-#define WS2812_SPI_CLOCK_HZ         2300000UL
+#define WS2812_SPI_CLOCK_HZ         2410000UL
 #define WS2812_DMA_CHANNEL          GPDMA_CH_3
 
 /*

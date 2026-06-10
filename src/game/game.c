@@ -97,7 +97,7 @@ switch (note->lane)
 
     case 2: // yellow
         r = 16;
-        g = 5;
+        g = 16;
         break;
 
     case 3: // blue

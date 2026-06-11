@@ -17,6 +17,9 @@ typedef struct
     uint16_t length_ms;
 } GameNote_t;
 
+uint32_t game_get_hits(void);
+uint32_t game_get_total(void);
+
 void game_init(void);
 
 void game_set_song(
@@ -28,7 +31,9 @@ void game_start(uint32_t start);
 void game_stop(void);
 
 void game_update(
-    uint32_t current_time_ms
+    uint32_t        current_time_ms,
+    const uint32_t *button_times,
+    uint32_t        button_count
 );
 
 

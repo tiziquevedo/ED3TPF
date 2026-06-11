@@ -5,10 +5,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-/* -------------------------------------------------------------------------- */
-/* Configuration                                                              */
-/* -------------------------------------------------------------------------- */
-
 #define WS2812_MATRIX_WIDTH         8
 #define WS2812_MATRIX_HEIGHT        8
 #define WS2812_LED_COUNT            (WS2812_MATRIX_WIDTH * WS2812_MATRIX_HEIGHT)

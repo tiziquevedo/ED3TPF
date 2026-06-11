@@ -7,52 +7,15 @@
 
 #include <string.h>
 
-/* -------------------------------------------------------------------------- */
-/* Configuration                                                              */
-/* -------------------------------------------------------------------------- */
-
 #define WS2812_SPI_CLOCK_HZ         2410000UL
 #define WS2812_DMA_CHANNEL          GPDMA_CH_3
 
-/*
- * SPI symbol encoding:
- *
- * 0 -> 100
- * 1 -> 110
- *
- * Encoded MSB-first into 3 bytes
- */
+
 #define WS2812_SYMBOL_0             0b100
 #define WS2812_SYMBOL_1             0b110
 
-/* -------------------------------------------------------------------------- */
-/* Private Variables                                                          */
-/* -------------------------------------------------------------------------- */
-
-/*
- * Framebuffer is already SPI-expanded.
- *
- * 64 LEDs × 9 bytes = 576
- * Reset tail = 32 bytes
- * Total = 608 bytes
- */
-
-
-/*
- * Runtime brightness
- * Default = 30%
- */
 static uint8_t wsBrightness = WS2812_BRIGHTNESS_PERCENT;
 
-/*
- * DMA self-loop descriptor.
- *
- * LPC17xx LLI format:
- * srcAddr
- * dstAddr
- * nextLLI
- * control
- */
 typedef struct {
     uint32_t srcAddr;
     uint32_t dstAddr;
@@ -61,10 +24,6 @@ typedef struct {
 } WS2812_DMA_LLI_T;
 
 static WS2812_DMA_LLI_T wsDMAlli;
-
-/* -------------------------------------------------------------------------- */
-/* Private Function Prototypes                                                */
-/* -------------------------------------------------------------------------- */
 
 static void display_initSSP0(void);
 static void display_initDMA(void);
@@ -83,10 +42,6 @@ static void WS2812_EncodeByte(
 
 static inline uint8_t WS2812_ApplyBrightness(uint8_t value);
 
-/* -------------------------------------------------------------------------- */
-/* Private Functions                                                          */
-/* -------------------------------------------------------------------------- */
-
 static inline uint8_t WS2812_ApplyBrightness(uint8_t value)
 {
     return (uint8_t)(
@@ -94,14 +49,7 @@ static inline uint8_t WS2812_ApplyBrightness(uint8_t value)
     );
 }
 
-/*
- * Serpentine XY mapping
- *
- * y=0
- * 0  1  2  3  4  5  6  7
- * 15 14 13 12 11 10 9  8
- * 16 17 ...
- */
+
 uint16_t WS2812_XYToIndex(uint8_t x, uint8_t y)
 {
     if (x >= WS2812_MATRIX_WIDTH ||
@@ -119,18 +67,6 @@ uint16_t WS2812_XYToIndex(uint8_t x, uint8_t y)
         + ((WS2812_MATRIX_WIDTH - 1U) - x);
 }
 
-/*
- * Encode one byte into 3 bytes using:
- *
- * 0 -> 100
- * 1 -> 110
- *
- * Example:
- *
- * 10110010
- *
- * becomes 24 SPI bits
- */
 static void WS2812_EncodeByte(
     uint8_t value,
     uint8_t* dst
@@ -152,26 +88,12 @@ static void WS2812_EncodeByte(
         }
     }
 
-    /*
-     * Split 24-bit stream into 3 bytes
-     */
     dst[0] = (encoded >> 16) & 0xFF;
     dst[1] = (encoded >> 8)  & 0xFF;
     dst[2] = encoded & 0xFF;
 }
 
-/*
- * Encode one LED directly into framebuffer.
- *
- * WS2812 uses:
- * GRB order
- *
- * Each LED occupies 9 bytes:
- *
- * G = 3 bytes
- * R = 3 bytes
- * B = 3 bytes
- */
+
 static void WS2812_EncodeColor(
     uint16_t ledIndex,
     uint8_t r,
@@ -189,16 +111,12 @@ static void WS2812_EncodeColor(
             ledIndex * WS2812_BYTES_PER_LED
         ];
 
-    /*
-     * Apply global brightness
-     */
+
     r = WS2812_ApplyBrightness(r);
     g = WS2812_ApplyBrightness(g);
     b = WS2812_ApplyBrightness(b);
 
-    /*
-     * GRB order
-     */
+
     WS2812_EncodeByte(g, &ledPtr[0]);
     WS2812_EncodeByte(r, &ledPtr[3]);
     WS2812_EncodeByte(b, &ledPtr[6]);
@@ -215,7 +133,6 @@ static void WS2812_FillEncodedZero(void)
     {
         uint8_t *ledPtr = &wsFramebuffer[i * WS2812_BYTES_PER_LED];
 
-        // Fill GRB with encoded zero
         memcpy(&ledPtr[0], encoded, 3);
         memcpy(&ledPtr[3], encoded, 3);
         memcpy(&ledPtr[6], encoded, 3);
@@ -225,17 +142,12 @@ static void WS2812_FillEncodedZero(void)
            0,
            WS2812_FRAMEBUFFER_SIZE - (WS2812_LED_COUNT * WS2812_BYTES_PER_LED));
 }
-/* -------------------------------------------------------------------------- */
-/* SSP0 Configuration                                                         */
-/* -------------------------------------------------------------------------- */
 
 static void display_initSSP0(void)
 {
     PINSEL_CFG_T pinCfg;
 
-    /*
-     * P0.18 -> SSP0 MOSI
-     */
+
     pinCfg.port       = 0;
     pinCfg.pin        = 18;
     pinCfg.func       = PINSEL_FUNC_10;
@@ -256,9 +168,7 @@ static void display_initSSP0(void)
 
     SSP_Init(LPC_SSP0, &sspCfg);
 
-    /*
-     * Enable SSP0 DMA TX
-     */
+
     SSP_DMACmd(
         LPC_SSP0,
         SSP_DMA_TX,
@@ -275,13 +185,6 @@ static void display_initDMA(void)
 
     GPDMA_Init();
 
-    /*
-     * Self-looping LLI
-     *
-     * Source = framebuffer
-     * Dest   = SSP0->DR
-     * Next   = itself
-     */
     wsDMAlli.srcAddr =
         (uint32_t)wsFramebuffer;
 
